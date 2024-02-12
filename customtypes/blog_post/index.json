@@ -26,7 +26,7 @@
           "placeholder": ""
         }
       },
-      "hove_image": {
+      "hover_image": {
         "type": "Image",
         "config": {
           "label": "Hove Image",

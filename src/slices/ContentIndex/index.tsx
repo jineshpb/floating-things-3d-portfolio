@@ -16,6 +16,7 @@ export type ContentIndexProps = SliceComponentProps<Content.ContentIndexSlice>;
 const ContentIndex = async ({
   slice,
 }: ContentIndexProps): Promise<JSX.Element> => {
+  //its not a JSX element because of the async function, but a promise of a JSX element
   const client = createClient();
   const blogPosts = await client.getAllByType("blog_post");
   const projects = await client.getAllByType("project");

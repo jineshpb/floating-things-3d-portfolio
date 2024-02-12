@@ -37,11 +37,11 @@ interface BlogPostDocumentData {
    *
    * - **Field Type**: Image
    * - **Placeholder**: *None*
-   * - **API ID Path**: blog_post.hove_image
+   * - **API ID Path**: blog_post.hover_image
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/field#image
    */
-  hove_image: prismic.ImageField<never>;
+  hover_image: prismic.ImageField<never>;
 
   /**
    * Slice Zone field in *Blog Post*
