@@ -5,6 +5,9 @@ import gsap from "gsap";
 import Link from "next/link";
 import React, { use, useEffect, useRef } from "react";
 import { MdArrowOutward } from "react-icons/md";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+gsap.registerPlugin(ScrollTrigger);
 
 type ContentListProps = {
   items: Content.BlogPostDocument[] | Content.ProjectDocument[];
@@ -21,6 +24,8 @@ export default function ContentList({
 }: ContentListProps) {
   const component = useRef(null);
   const revealRef = useRef(null);
+  const itemsRef = useRef<Array<HTMLLIElement | null>>([]);
+
   const [currentItem, setCurrentItem] = React.useState<null | number>(null);
 
   const urlPrefix = contentType === "Blog" ? "/blog" : "/project";
@@ -28,7 +33,35 @@ export default function ContentList({
   const lastMousePosition = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
-    const handleMouseMove = (e: React.MouseEvent) => {
+    let ctx = gsap.context(() => {
+      itemsRef.current.forEach((item, index) => {
+        gsap.fromTo(
+          item,
+          {
+            opacity: 0,
+            y: 20,
+          },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 1.3,
+            ease: "elastic.out(1, 0.3)",
+            stagger: 0.2,
+            scrollTrigger: {
+              trigger: item,
+              start: "top bottom-=100px",
+              end: "bottom center",
+              toggleActions: "play none none reverse",
+            },
+          }
+        );
+      });
+      return () => ctx.revert();
+    }, component);
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
       const mousePos = { x: e.clientX, y: e.clientY + window.scrollY };
 
       //calculate speed and direction
@@ -49,6 +82,7 @@ export default function ContentList({
               speed * (mousePos.x > lastMousePosition.current.x ? 1 : -1),
             ease: "back.out(2)",
             duration: 0.5,
+            opacity: 1,
           });
         }
         lastMousePosition.current = mousePos;
@@ -78,6 +112,16 @@ export default function ContentList({
     });
   });
 
+  useEffect(() => {
+    contentImages.forEach((url, index) => {
+      if (!url) return;
+      {
+        const img = new Image();
+        img.src = url;
+      }
+    });
+  }, [contentImages]);
+
   const onMouseEnter = (index: number) => {
     setCurrentItem(index);
   };
@@ -98,6 +142,7 @@ export default function ContentList({
                 key={index}
                 className="list-item opacity-0f  "
                 onMouseEnter={() => onMouseEnter(index)}
+                ref={(el) => (itemsRef.current[index] = el)}
               >
                 <Link
                   href={urlPrefix + "/" + item.uid}
